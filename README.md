@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI-Powered Lead Management Dashboard
 
-## Getting Started
+A premium, production-ready lead management system with AI-powered lead qualification, built with Next.js 14+, Supabase, and Tailwind CSS.
 
-First, run the development server:
+## 🚨 Critical Setup Step: Create Database Table
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The error `Database Error: Could not find the table 'public.leads'` occurs because the database table has not been created yet.
+
+**You must run the following SQL in your [Supabase SQL Editor](https://supabase.com/dashboard/project/kybzdjdhbnmwoazemnfg/sql):**
+
+```sql
+-- 1. Create the leads table
+CREATE TABLE leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  business_type TEXT NOT NULL,
+  requirement TEXT NOT NULL,
+  
+  -- AI Generated Fields
+  ai_summary TEXT,
+  lead_quality_score TEXT CHECK (lead_quality_score IN ('Hot', 'Warm', 'Cold')),
+  suggested_next_action TEXT,
+  
+  -- Metadata
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Create index for performance
+CREATE INDEX idx_lead_quality_score ON leads(lead_quality_score);
+
+-- 3. (Optional) Enable Row Level Security if needed, 
+-- implies you need to add policies for anon insert if you want public submission 
+-- without auth, or use service role. 
+-- For this Demo, we assume RLS is either off or configured to allow anon inserts.
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public inserts" ON leads FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow anon select" ON leads FOR SELECT USING (true); 
+-- Note: In production, "Allow anon select" is dangerous. 
+-- Better: Only allow authenticated (admin) to select.
+-- CREATE POLICY "Allow admin select" ON leads FOR SELECT TO authenticated USING (true);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> **Note**: This application uses the `anon` key. Ensure your RLS policies allow the `anon` role to `INSERT` rows.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Getting Started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. **Environment Variables**
+   Ensure `.env.local` is present with:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `OPENROUTER_API_KEY`
+   - `ADMIN_USERNAME` / `ADMIN_PASSWORD`
 
-To learn more about Next.js, take a look at the following resources:
+3. **Run Development Server**
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Access Application**
+   - **Public Form**: [http://localhost:3000](http://localhost:3000)
+   - **Admin Login**: [http://localhost:3000/login](http://localhost:3000/login) (Credentials: `admin` / `admin123`)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ✨ Features
+- **AI Analysis**: Automatically scores leads as Hot/Warm/Cold.
+- **Real-time Dashboard**: Track metrics and filter leads.
+- **Automation**: One-click webhook trigger for follow-ups.
