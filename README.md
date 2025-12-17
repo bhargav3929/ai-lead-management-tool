@@ -2,8 +2,6 @@
 
 <div align="center">
 
-![Project Banner](https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop)
-
 ### Intelligent Lead Qualification & Modern Dashboard Architecture
 
 [Live Demo](https://ai-lead-management-tool.vercel.app/) · [Report Bug](https://github.com/bhargav3929/ai-lead-management-tool/issues) · [Request Feature](https://github.com/bhargav3929/ai-lead-management-tool/issues)
